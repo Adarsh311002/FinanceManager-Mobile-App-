@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Keyboard,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/Ionicons';
 import LinearGradient from 'react-native-linear-gradient';
-import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated'; 
+import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useStore, TransactionType } from '../store/useStore';
@@ -48,12 +49,32 @@ export default function AddTransactionScreen() {
   const [note, setNote] = useState('');
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const isAndroid15Plus =
+    Platform.OS === 'android' && Number(Platform.Version) >= 35;
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, e =>
+      setKeyboardHeight(e.endCoordinates.height),
+    );
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const showError = (message: string) => {
     setErrorMsg(message);
-    setTimeout(() => setErrorMsg(null), 3000); 
+    setTimeout(() => setErrorMsg(null), 3000);
   };
 
   const handleSave = () => {
@@ -83,12 +104,27 @@ export default function AddTransactionScreen() {
     navigation.goBack();
   };
 
+  const Wrapper = Platform.OS === 'ios' ? KeyboardAvoidingView : View;
+  const wrapperProps =
+    Platform.OS === 'ios'
+      ? {
+          behavior: 'padding' as const,
+          style: { flex: 1, backgroundColor: theme.background },
+        }
+      : {
+          style: {
+            flex: 1,
+            backgroundColor: theme.background,
+            paddingBottom: isAndroid15Plus ? keyboardHeight - 70 : 0,
+          },
+        };
+
+
+  const footerPaddingBottom =
+    keyboardHeight > 0 ? 10 : Math.max(insets.bottom + 10, 20);
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: theme.background }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : insets.top + 20}
-    >
+    <Wrapper {...wrapperProps}>
       <View style={[styles.header, { paddingTop: insets.top + 20 }]}>
         <Text style={[styles.headerTitle, { color: theme.text }]}>
           New Transaction
@@ -107,10 +143,8 @@ export default function AddTransactionScreen() {
       )}
 
       <ScrollView
-        contentContainerStyle={[
-          styles.scrollContainer,
-          { paddingBottom: insets.bottom + 100 },
-        ]}
+        style={{ flex: 1 }}
+        contentContainerStyle={[styles.scrollContainer, { paddingBottom: 20 }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -232,7 +266,6 @@ export default function AddTransactionScreen() {
               {date.toDateString()}
             </Text>
           </TouchableOpacity>
-
           {showDatePicker && (
             <DateTimePicker
               value={date}
@@ -277,31 +310,40 @@ export default function AddTransactionScreen() {
             />
           </View>
         </Animated.View>
-
-        <Animated.View entering={FadeInDown.delay(500).duration(400)}>
-          <TouchableOpacity
-            onPress={handleSave}
-            activeOpacity={0.8}
-            style={styles.saveBtnWrapper}
-          >
-            <LinearGradient
-              colors={['#57C9A4', '#34D399']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.gradientBtn}
-            >
-              <Text style={styles.saveBtnText}>Save Transaction</Text>
-              <Icon
-                name="checkmark-circle"
-                size={24}
-                color="#FFF"
-                style={{ marginLeft: 8 }}
-              />
-            </LinearGradient>
-          </TouchableOpacity>
-        </Animated.View>
       </ScrollView>
-    </KeyboardAvoidingView>
+
+      <Animated.View
+        entering={FadeInDown.delay(500).duration(400)}
+        style={[
+          styles.fixedFooter,
+          {
+            paddingBottom: footerPaddingBottom,
+            backgroundColor: theme.background,
+          },
+        ]}
+      >
+        <TouchableOpacity
+          onPress={handleSave}
+          activeOpacity={0.8}
+          style={styles.saveBtnWrapper}
+        >
+          <LinearGradient
+            colors={['#57C9A4', '#34D399']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.gradientBtn}
+          >
+            <Text style={styles.saveBtnText}>Save Transaction</Text>
+            <Icon
+              name="checkmark-circle"
+              size={24}
+              color="#FFF"
+              style={{ marginLeft: 8 }}
+            />
+          </LinearGradient>
+        </TouchableOpacity>
+      </Animated.View>
+    </Wrapper>
   );
 }
 
@@ -395,8 +437,13 @@ const styles = StyleSheet.create({
   inputIcon: { marginRight: 12 },
   noteInput: { flex: 1, fontSize: 16, minHeight: 60, textAlignVertical: 'top' },
 
+  fixedFooter: {
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'transparent',
+  },
   saveBtnWrapper: {
-    marginTop: 20,
     shadowColor: '#57C9A4',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
