@@ -1,97 +1,117 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 💳 FinanceCore
 
-# Getting Started
+<div align="center">
+  <img src="https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React Native" />
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Zustand-Bear?style=for-the-badge&color=8B5CF6" alt="Zustand" />
+  <img src="https://img.shields.io/badge/Reanimated-3.x-57C9A4?style=for-the-badge" alt="Reanimated" />
+</div>
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+<br/>
 
-## Step 1: Start Metro
+> **FinanceCore** is a premium, high-performance personal finance and expense tracking mobile application built with React Native. Designed with a strict adherence to a "Deep Dark" fintech aesthetic, it features fluid 60fps animations, persistent local storage, and a heavily optimized cross-platform UX that flawlessly supports modern OS environments like Android 15 Edge-to-Edge.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+---
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## ✨ Key Features
 
-```sh
-# Using npm
-npm start
+* **Premium "Deep Dark" UI:** A Figma-perfect implementation featuring subtle glassmorphism, dynamic gradients, and unified color coding across all screens.
+* **Live Theme Previews:** Fully dynamic Light and Dark modes with real-time UI switching during the onboarding flow.
+* **Interactive Activity Rings:** A highly customized, animated Donut/Pie chart built with `react-native-gifted-charts`, featuring tap-to-focus interactions and dynamic center labels.
+* **Fluid Animations:** Powered by `react-native-reanimated`, featuring staggered list entrances, spring-loaded modals, and layout transitions.
+* **Bulletproof Keyboard UX:** Custom native keyboard listeners and dynamically padded `ScrollViews` that bypass default OS bugs to ensure inputs and sticky buttons never overlap—even on Android 15.
+* **Zero-Latency State:** State management and persistent local storage powered by **Zustand** and **MMKV**, ensuring user data and theme preferences load instantly on app boot.
 
-# OR using Yarn
-yarn start
-```
+---
 
-## Step 2: Build and run your app
+## 📱 Visual Previews
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+*(📸 **Pro Tip:** Add your screenshots or GIFs to an `assets` folder in your repo and replace these placeholder links!)*
 
-### Android
+| Onboarding | Home Dashboard | Add Transaction | Analytics Summary |
+|:---:|:---:|:---:|:---:|
+| <img src="./assets/onboard.png" width="200" /> | <img src="./assets//home.png" width="200" /> | <img src="./assets/tran.png" width="200" /> | <img src="./assets/sum.png" width="200" /> |
 
-```sh
-# Using npm
-npm run android
+---
 
-# OR using Yarn
-yarn android
-```
+## 🛠️ Tech Stack & Libraries
 
-### iOS
+* **Framework:** React Native (CLI) / TypeScript
+* **Navigation:** React Navigation (`@react-navigation/bottom-tabs`, `@react-navigation/native-stack`)
+* **State Management:** Zustand
+* **Local Storage:** Zustand Persist + MMKV 
+* **Animations:** React Native Reanimated v3
+* **Data Visualization:** React Native Gifted Charts
+* **UI Components:** React Native Vector Icons (Ionicons), React Native Linear Gradient
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+---
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## 🧠 Notable Technical Implementations
 
-```sh
-bundle install
-```
+### 1. Android 15 Edge-to-Edge Keyboard Fixes
+Modern Android OS updates aggressively enforce edge-to-edge drawing, which breaks the standard `KeyboardAvoidingView`. FinanceCore implements a custom hook utilizing raw `Keyboard.addListener` events to dynamically adjust `paddingBottom`, allowing sticky footer buttons to physically ride the keyboard while remaining visible over the OS gesture pills.
 
-Then, and every time you update your native dependencies, run:
+### 2. Custom Animated Modals (Bypassing Native Alerts)
+Instead of relying on the un-stylable native `Alert.alert`, destructive actions (like Sign Out) trigger a custom Reanimated Modal. It features a dimmed background overlay, `ZoomIn.springify()` physics, and theme-compliant buttons to maintain total immersion.
 
-```sh
-bundle exec pod install
-```
+### 3. Stable Category Color Hashing
+Transactions use a highly unified color palette (e.g., Food is always Rose, Transport is always Blue). Instead of assigning colors via array indices (which shuffle when new items are added), FinanceCore uses a strict `Record<string, string>` mapping to ensure visual stability across the Home lists and Summary charts.
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
 
-```sh
-# Using npm
-npm run ios
+## 📂 Project Structure
 
-# OR using Yarn
-yarn ios
-```
+📦 src
+ ┣ 📂 assets           # Local fonts, images, and Lottie files
+ ┣ 📂 navigation       # Root stack and Bottom Tabs setup
+ ┣ 📂 screens
+ ┃ ┣ 📜 OnboardingScreen.tsx  # Name capture & live theme setup
+ ┃ ┣ 📜 HomeScreen.tsx        # Dashboard, Bank Card, Recent List
+ ┃ ┣ 📜 AddTransactionScreen.tsx # Interactive form with sticky footer
+ ┃ ┗ 📜 SummaryScreen.tsx     # Animated activity ring and breakdown
+ ┣ 📂 store
+ ┃ ┗ 📜 useStore.ts    # Zustand global state (Transactions, Theme, User)
+ ┣ 📂 theme
+ ┃ ┗ 📜 colors.ts      # Strict Light/Dark mode color palettes
+ ┗ 📂 utils
+   ┗ 📜 formatters.ts  # Currency and date parsing logic
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+---
 
-## Step 3: Modify your app
+## 🚀 Getting Started
 
-Now that you have successfully run the app, let's make changes!
+### Prerequisites
+* Node.js (v18+)
+* React Native Development Environment (Ruby, Xcode, Android Studio)
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### Installation
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+1. **Clone the repository:**
+   git clone https://github.com/Adarsh311002/FinanceManager-Mobile-App-.git
+   cd FinanceCore
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+2. **Install dependencies:**
+   npm install
 
-## Congratulations! :tada:
+3. **Install CocoaPods (iOS only):**
+   cd ios
+   pod install
+   cd ..
 
-You've successfully run and modified your React Native App. :partying_face:
+4. **Run the application:**
+   # For iOS
+   npm run ios
+   
+   # For Android
+   npm run android
 
-### Now what?
+---
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## 📝 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+---
+<div align="center">
+  <i>Crafted with precision and passion.</i>
+</div>
